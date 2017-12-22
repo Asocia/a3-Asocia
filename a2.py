@@ -148,32 +148,14 @@ template="""<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>%s</title>
-    <style>
-      body{
-        font-family:Calibri, sans-serif;
-        background-color:azure;
-          }
-      th{
-        font-size:18px;
-        color:#000000;
-      
-        }
-      table, tr,th,td{
-        border: 2px solid;
-        border-color: blue;
-        border-collapse:collapse;
-        padding:4px 5px 4px 4px;
-        text-align: center;
-        }
-      .title{
-        font-size:18px;
-        color:#456FEA;
-            }
-    </style>
+    <title>%(title)s</title>
+    <link rel="stylesheet" type="text/css" href="/static/stylesheet.css"/>
+
   </head>
   <body>
-    %s
+    %(navbar)s
+    %(form)s
+    %(table)s
   </body>
 </html>
 """
