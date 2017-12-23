@@ -14,6 +14,7 @@ letters="ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZabcçdefgğhıijklmnoöprsştuüvyz9
 trans={i:letters.index(i) for i in letters}
 navbar="""<ul>
   <li><a class="active" href="/">Home</a></li>
+  <li><a href="/search">Search a Province</a></li>
   <li><a href="/sort">Sort by...</a></li>
   <li><a href="#filter">Filter</a></li>
   <li><a href="#login">Login</a></li>
@@ -28,12 +29,8 @@ def look_at_this_dude(li):
 	return ([trans.get(li[0][i]) for i in range(len(li[0]))])
 
 def index():
-	
 	return a2.template %{'title':a2.title(),'navbar':navbar,'table':a2.make_table(a2.contents),'form':""}
-#~ def sort_by_page():
-	
-	
-	#~ return a2.template %{'title':a2.title(),'navbar':navbar,'table':a2.make_table(a2.contents),'form':form}
+
 def sort_by_what():
 	try:
 		a=request.GET['a']
@@ -50,7 +47,6 @@ def sort_by_what():
 			break
 	if b!="True":
 		di["ao"],di["do"]=di["do"],di["ao"]
-	
 	form="""<form action="/sort" method="GET">Sort by
                 <select name="a">
                     <option value="name" %(name)s>Province name</option>
@@ -63,8 +59,7 @@ def sort_by_what():
                 <input type="radio" name="b" value="True" %(ao)s>ascending order.
                 <input type="radio" name="b" value="False" %(do)s>descending order.
                 <input type="submit" value="Apply" />
-             </form>"""%di
-             
+             </form><br>"""%di
 	split_contents()
 	global meta1, content1
 	meta,content=deepcopy(meta1),deepcopy(content1)
@@ -73,7 +68,7 @@ def sort_by_what():
 		a=request.GET['a']
 		b="True"
 	else:
-		return a2.template %{'title':a2.title(),'navbar':navbar,'table':a2.make_table(a2.contents),'form':form}
+		return a2.template %{'title':'Sort by...','navbar':navbar,'table':a2.make_table(a2.contents),'form':form}
 	if 'b' in request.GET:
 		b=request.GET['b']
 	if a=="name":
@@ -86,7 +81,6 @@ def sort_by_what():
 			b="Descending"
 			data+=reversed(sorted(content,key=look_at_this_dude))
 		a="Province Name"
-
 	else:
 		content.sort(key = lambda x : x[a2.find_starting_point(a,a2.contents)])
 		if b=="True":
@@ -109,14 +103,41 @@ def sort_by_what():
 			a="Rate of Net Migration"
 	data=meta+data
 	return a2.template %{'title':"Sorted by %s in %s Order "%(a,b),'navbar':navbar,'form':form,'table':a2.make_table(data)}
-		
+def search_province():
+	form="""<form action="/search" method="GET" accept-charset="US-ASCII" >
+	
+                <input size="40" type="search" placeholder="Please enter at least 2 characters. (Only in English) " pattern=".{2,}" required name="province">
+                <input type="submit" value="Search" />
+             </form><br>"""
+	try:
+		name=request.GET['province'].lower()
+	except KeyError:
+		name=""
+	if name =="":
+		return a2.template %{'title':"Search a Province",'navbar':navbar,'table':a2.make_table(a2.contents),'form':form}
+	split_contents()
+	global content1,meta1
+	meta,content=deepcopy(meta1)[:a2.find_starting_point("total",a2.contents)+1],deepcopy(content1)
+	data=[]
+	for row in content:
+		if name.lower() in row[0].replace('İ','i').lower().replace('ç','c').replace('ğ','g').replace('ı','i').replace('ö','o').replace('ş','s').replace('ü','u'):
+			if name.lower()== row[0][:len(name.lower())].replace('İ','i').lower().replace('ç','c').replace('ğ','g').replace('ı','i').replace('ö','o').replace('ş','s').replace('ü','u'):
+				data=[row]+data
+			else:
+				data+=[row]
+	data=meta+data
+	if data==meta:
+		return a2.template %{'title':"Searching Result",'navbar':navbar,'form':form,'table':"<p>No records were found that match the specified search crieteria :( <a href=\"/search\"> See full table...</a></p>"}
+	a2.calculate_the_cells(data)
+	return a2.template %{'title':"Searching Result",'navbar':navbar,'form':form,'table':a2.make_table(data)}
+	
 def server_static(path):
 	return static_file(path, root=".")
 
 
-
+route('/search', 'GET', search_province)
 route('/', 'GET', index)
-route('/sort', 'GET' , sort_by_what)
+route('/sort', 'GET', sort_by_what)
 route('/static/<path>', 'GET', server_static)
 
 #####################################################################
