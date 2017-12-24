@@ -150,7 +150,6 @@ template="""<!DOCTYPE html>
     <meta charset="utf-8">
     <title>%(title)s</title>
     <link rel="stylesheet" type="text/css" href="/static/stylesheet.css"/>
-
   </head>
   <body>
     %(navbar)s
