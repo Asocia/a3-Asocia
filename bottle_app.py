@@ -19,7 +19,7 @@ navbar="""<ul>
 		<li><a href="/search">Search a Province</a></li>
 		<li><a href="/sort">Sort by...</a></li>
 		<li><a href="/filter">Filter</a></li>
-		<li><a href="#">Login...</a></li>
+		<li><a class="login" href="#">Login</a></li>
 	</ul>
 <br>"""
 def split_contents():
